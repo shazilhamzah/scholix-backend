@@ -17,6 +17,10 @@ const userSchema = new Schema({
         type:String,
         required:true,
     },
+    cgpa:{
+        type:Number,
+        default:0
+    },
     date:{
         type:Date,
         default:Date.now

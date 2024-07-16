@@ -16,6 +16,7 @@ app.use('/api/auth',require('./routes/auth'))
 app.use('/api/gpa',require('./routes/auth'))
 app.use('/api/semester',require('./routes/semester'))
 app.use('/api/subject',require('./routes/subject'))
+app.use('/api/exam',require('./routes/exam'))
 
 
 

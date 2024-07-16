@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Subject = require("../models/Subject");
 var fetchSemester = require("../middleware/fetchSemester");
-var fetchUser = require("../middleware/fetchuser");
+var fetchUser = require("../middleware/fetchUser");
 const { body, validationResult } = require("express-validator");
 
 //? ADD A SUBJECT USING: POST "/api/subject/newsubject" WITH VALIDATIONS - LOGIN REQUIRED

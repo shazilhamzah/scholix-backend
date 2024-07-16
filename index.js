@@ -15,10 +15,10 @@ app.use(cors());
 app.use('/api/auth',require('./routes/auth'))
 app.use('/api/gpa',require('./routes/auth'))
 app.use('/api/semester',require('./routes/semester'))
-// app.use('/api/notes',require('./routes/subjects'))
+app.use('/api/subject',require('./routes/subject'))
 
 
 
 app.listen(port, () => {
-    console.log(`Sholix backend listening on port ${port}`)
+    console.log(`Scholix backend listening on port ${port}`)
 })

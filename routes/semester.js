@@ -8,7 +8,7 @@ const { body, validationResult } = require("express-validator");
 router.post(
   "/newsemester",
   fetchuser,
-  [body("name", "Name must be atleast  characters.").isLength({ min: 2 })],
+  [body("name", "Name must be atleast 2 characters.").isLength({ min: 2 })],
   async (req, res) => {
     try {
       const { name } = req.body;

@@ -13,21 +13,24 @@ router.post(
   [body("name", "Name must be atleast 2 characters.").isLength({ min: 2 })],
   async (req, res) => {
     try {
-      const { name, creditHrs, subjectType, grading, teacherName } = req.body;
+      let success = false;
+      const { name, creditHrs, subjectType, grading,grade, teacherName } = req.body;
       const semesterID = req.semester.id;
       let subjectPresent = await Subject.findOne({
         name,
         semester: semesterID,
       });
       if (subjectPresent) {
+        success=false;
         return res
           .status(400)
-          .json({ error: "Sorry a subject with this name already exists!" });
+          .json({ error: "Sorry a subject with this name already exists!" ,success:success});
       }
 
       const result = validationResult(req);
       if (!result.isEmpty()) {
-        return res.status(400).json({ errors: result.array() });
+        success=false;
+        return res.status(400).json({ errors: result.array(),success:success });
       }
 
       const newSubject = new Subject({
@@ -36,14 +39,16 @@ router.post(
         creditHrs: creditHrs,
         subjectType: subjectType,
         grading: grading,
+        grade:grade,
         teacherName: teacherName,
       });
 
       const savedSubject = await newSubject.save();
-      res.json(savedSubject);
+      success=true;
+      res.json({savedSubject,success:success});
     } catch (error) {
       console.error(error.message);
-      res.status(500).send("Some error occured!");
+      res.status(500).send({msg:"Some error occured!",success:false});
     }
   }
 );

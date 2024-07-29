@@ -17,7 +17,6 @@ const SubjectSchema = new Schema({
     },
     subjectType:{
         type:String,
-        required:true,
     },
     grading:{
         type:String,

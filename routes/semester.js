@@ -11,30 +11,34 @@ router.post(
   [body("name", "Name must be atleast 2 characters.").isLength({ min: 2 })],
   async (req, res) => {
     try {
-      const { name } = req.body;
+      let success = false;
+      const { name,sgpa } = req.body;
       const userID = req.user.id;
       let semesterPresent = await Semester.findOne({ name, user: userID });
       if (semesterPresent) {
+        success = false;
         return res
           .status(400)
-          .json({ error: "Sorry a semester with this name already exists!" });
+          .json({ error: "Sorry a semester with this name already exists!",success:success });
       }
 
       const result = validationResult(req);
       if (!result.isEmpty()) {
-        return res.status(400).json({ errors: result.array() });
+        success=false;
+        return res.status(400).json({ errors: result.array(),success:success });
       }
 
       const newSemester = new Semester({
         user: req.user.id,
         name,
+        sgpa,
       });
-
+      success = true;
       const savedSemester = await newSemester.save();
-      res.json(savedSemester);
+      res.json({savedSemester,success:success});
     } catch (error) {
       console.error(error.message);
-      res.status(500).send("Some error occured!");
+      res.status(500).send({msg:"Some error occured!",success:false});
     }
   }
 );
@@ -130,5 +134,50 @@ router.delete("/deletesemester/:id", fetchuser, async (req, res) => {
     res.status(500).send("Some error occured!");
   }
 });
+
+
+//? TOGGLE SEMESTER ACTIVE STATUS USING: POST "/api/semester/toggleactive/:id" - LOGIN REQUIRED
+router.post("/toggleactive/:id", fetchuser, async (req, res) => {
+  try {
+    const semesterID = req.params.id;
+
+    // FINDING THE SEMESTER TO BE UPDATED
+    let semester = await Semester.findById(semesterID);
+    if (!semester) {
+      return res.status(404).send("Semester not found!");
+    }
+
+    // CHECKING USER AUTHORIZATION
+    if (semester.user.toString() !== req.user.id) {
+      return res.status(401).send("Unauthorized!");
+    }
+
+    // IF THE SEMESTER IS BECOMING ACTIVE
+    if (!semester.active) {
+      // DEACTIVATE ALL OTHER SEMESTERS FOR THIS USER
+      await Semester.updateMany(
+        { user: req.user.id, active: true },
+        { $set: { active: false } }
+      );
+    }
+
+    // TOGGLE ACTIVE STATUS
+    semester.active = !semester.active;
+
+    // SAVING THE UPDATED SEMESTER
+    semester = await Semester.findByIdAndUpdate(
+      semesterID,
+      { active: semester.active },
+      { new: true }
+    );
+
+    res.json(semester);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error!");
+  }
+});
+
+
 
 module.exports = router;

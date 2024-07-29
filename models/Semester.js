@@ -15,6 +15,10 @@ const semesterSchema = new Schema({
     sgpa:{
         type:Number,
         default:0
+    },
+    active:{
+        type:Boolean,
+        default:false
     }
 });
 

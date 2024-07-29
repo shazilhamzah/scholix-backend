@@ -6,6 +6,7 @@ var fetchUser = require("../middleware/fetchUser");
 var fetchSubject = require("../middleware/fetchSubject");
 const { body, validationResult } = require("express-validator");
 
+var success = false;
 //? ADD A EXAM USING: POST "/api/exam/newexam" WITH VALIDATIONS - LOGIN REQUIRED
 router.post(
   "/newexam",
@@ -28,7 +29,8 @@ router.post(
 
       const result = validationResult(req);
       if (!result.isEmpty()) {
-        return res.status(400).json({ errors: result.array() });
+        success=false;
+        return res.status(400).json({ errors: result.array(),success:success });
       }
 
       const newExam = new Exam({
@@ -38,14 +40,16 @@ router.post(
         obtainedMarks:obtainedMarks,
         averageMarks:averageMarks,
         weightage:weightage,
-        percentage:(obtainedMarks/totalMarks)*100
+        percentage:((obtainedMarks/totalMarks)*100).toFixed(3),
+        obtainedWeightage:((weightage*((obtainedMarks/totalMarks)*100))/100).toFixed(3)
       });
-
+      success = true;
       const savedExam = await newExam.save();
-      res.json(savedExam);
+      res.json({savedExam,success:success});
     } catch (error) {
+      success = false;
       console.error(error.message);
-      res.status(500).send("Some error occured!");
+      res.status(500).send({msg:"Some error occured!",success:success});
     }
   }
 );
@@ -100,7 +104,10 @@ router.post(
         newExam.weightage = weightage;
       }
       if(totalMarks&&obtainedMarks){
-        newExam.percentage = ((obtainedMarks/totalMarks)*100)
+        newExam.percentage = ((obtainedMarks/totalMarks)*100).toFixed(3)
+      }
+      if(weightage&&totalMarks&&obtainedMarks){
+        newExam.obtainedWeightage = ((weightage*((obtainedMarks/totalMarks)*100))/100).toFixed(3)
       }
 
       // FINDING THE NOTE TO BE UPDATED

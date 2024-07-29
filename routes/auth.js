@@ -7,7 +7,24 @@ var jwt = require("jsonwebtoken");
 var fetchuser = require("../middleware/fetchUser");
 const { findByIdAndUpdate } = require("../models/Semester");
 require("dotenv").config();
+const passport = require("passport");
 const JWT_SECRET = process.env.JWT_SECRET;
+
+//! GOOGLE AUTH CONFIG START
+// Redirect to Google for authentication
+router.get('/google',
+  passport.authenticate('google', { scope: ["profile", "email"] })
+);
+
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login', session: false }),
+  (req, res) => {
+    console.log("Google Auth Successful");
+    const token = req.user.generateAuthToken();
+    res.redirect(`http://localhost:3000/login?token=${token}`); 
+  }
+);
+//! GOOGLE AUTH CONFIG END
 
 //? CREATE A USER USING: POST "/api/auth/createuser" WITH VALIDATIONS - NO LOGIN REQUIRED
 router.post(

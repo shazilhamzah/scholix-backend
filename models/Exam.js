@@ -30,6 +30,10 @@ const ExamSchema = new Schema({
     percentage:{
         type:Number,
         required:true,
+    },
+    obtainedWeightage:{
+        type:Number,
+        required:true,
     }
 });
 

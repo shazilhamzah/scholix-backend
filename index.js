@@ -7,7 +7,6 @@ const session = require("express-session");
 const passport = require("passport");
 const OAuth2Strategy = require("passport-google-oauth2").Strategy;
 
-const clientSecret = "";
 
 connectToMongo();
 const app = express();
@@ -18,7 +17,7 @@ app.use(cors());
 //! GOOGLE AUTH CONFIGURATIONS START
 app.use(
     session({
-      secret: "1234ksdvb",
+      secret: process.env.GOOGLE_AUTH_SECRET,
       resave: false,
       saveUninitialized: true,
     })
@@ -29,9 +28,9 @@ app.use(passport.session());
 passport.use(
   new OAuth2Strategy(
     {
-      clientID: "630232520256-v4qbj32vtjahd7m0tltb7f0u26nebrj4.apps.googleusercontent.com",
-      clientSecret: "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",
-      callbackURL: "http://localhost:5000/api/auth/google/callback",
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
       scope:["profile","email"],
     },
     async (request, accessToken, refreshToken, profile, done) => {

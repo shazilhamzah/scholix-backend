@@ -10,14 +10,14 @@ const OAuth2Strategy = require("passport-google-oauth2").Strategy;
 
 connectToMongo();
 const app = express();
-const port = process.env.PORT;
+const port = process.env.REACT_APP_PORT;
 app.use(express.json());
 app.use(cors());
 
 //! GOOGLE AUTH CONFIGURATIONS START
 app.use(
     session({
-      secret: process.env.GOOGLE_AUTH_SECRET,
+      secret: process.env.REACT_APP_GOOGLE_AUTH_SECRET,
       resave: false,
       saveUninitialized: true,
     })
@@ -28,9 +28,9 @@ app.use(passport.session());
 passport.use(
   new OAuth2Strategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      clientID: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+      clientSecret: process.env.REACT_APP_GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.REACT_APP_GOOGLE_CALLBACK_URL,
       scope:["profile","email"],
     },
     async (request, accessToken, refreshToken, profile, done) => {

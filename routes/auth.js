@@ -8,20 +8,26 @@ var fetchuser = require("../middleware/fetchUser");
 const { findByIdAndUpdate } = require("../models/Semester");
 require("dotenv").config();
 const passport = require("passport");
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.REACT_APP_JWT_SECRET;
+const frontEndHost = process.env.REACT_APP_FRONTEND_HOST;
 
 //! GOOGLE AUTH CONFIG START
 // Redirect to Google for authentication
-router.get('/google',
-  passport.authenticate('google', { scope: ["profile", "email"] })
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login', session: false }),
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+    session: false,
+  }),
   (req, res) => {
     console.log("Google Auth Successful");
     const token = req.user.generateAuthToken();
-    res.redirect(`http://localhost:3000/login?token=${token}`); 
+    res.redirect(`${frontEndHost}/login?token=${token}`);
   }
 );
 //! GOOGLE AUTH CONFIG END
@@ -38,8 +44,9 @@ router.post(
     let success = false;
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      success = false;
-      return res.status(400).json({ success, errors: result.array() });
+      return res
+        .status(400)
+        .json({ success, error: "Enter valid credentials." });
     }
 
     // CHECK WHETHER EMAIL ALREADY EXIST
@@ -47,12 +54,10 @@ router.post(
       let user = await User.findOne({ email: req.body.email });
       if (user) {
         success = false;
-        return res
-          .status(400)
-          .json({
-            success,
-            error: "Sorry a user with this email already exists!",
-          });
+        return res.status(400).json({
+          success,
+          error: "Sorry a user with this email already exists!",
+        });
       }
 
       // BCRYPTING + SALT
@@ -77,9 +82,8 @@ router.post(
       res.json({ success, authToken });
     } catch (error) {
       // CATCHING ERROR
-      success = false;
       console.error(error.message);
-      res.status(500).send(success, "Some error occured!");
+      res.status(500).send({ success: false, error: "Some error occured!" });
     }
   }
 );
@@ -106,24 +110,26 @@ router.post(
       let user = await User.findOne({ email });
       if (!user) {
         success = false;
-        return res
-          .status(400)
-          .json({
-            success,
-            error: "Please try to login with correct credentials!",
-          });
+        return res.status(400).json({
+          success,
+          error: "Please try to login with correct credentials!",
+        });
+      } else if (!user.password) {
+        success = false;
+        return res.status(400).json({
+          success,
+          error: "Please try to login with your google account!",
+        });
       }
 
       // MATCHING CORRECT PASSWORD
       const passwordComapare = await bcrypt.compare(password, user.password);
       if (!passwordComapare) {
         success = false;
-        return res
-          .status(400)
-          .json({
-            success,
-            error: "Please try to login with correct credentials!",
-          });
+        return res.status(400).json({
+          success,
+          error: "Please try to login with correct credentials!",
+        });
       }
 
       // GAINING JSON WEB TOKEN ON AUTHENTICATION
@@ -138,13 +144,13 @@ router.post(
     } catch (error) {
       // CATCHING ERROR
       console.error(error.message);
-      res.status(500).send("Internal Server Error!");
+      res.status(500).send({ error: "Internal Server Error!" });
     }
   }
 );
 
 //? GETTING USER DATA: POST "/api/auth/getuser" - LOGIN REQUIRED
-router.post("/getuser", fetchuser, async (req, res) => {
+router.get("/getuser", fetchuser, async (req, res) => {
   try {
     const userID = req.user.id;
     const user = await User.findById(userID).select("-password");
@@ -156,8 +162,6 @@ router.post("/getuser", fetchuser, async (req, res) => {
   }
 });
 
-
-
 //? ADDING CGPA TO USER: POST "/api/gpa/addcgpa" - LOGIN REQUIRED
 router.post(
   "/addcgpa",
@@ -165,17 +169,21 @@ router.post(
   fetchuser,
   async (req, res) => {
     const result = validationResult(req);
-    if(!result.isEmpty()){
-        return res.status(400).json({error:result.array()})
+    if (!result.isEmpty()) {
+      return res.status(400).json({ error: result.array() });
     }
     try {
-        const userID = req.user.id;
-        const {cgpa} = req.body;
-        let updated = await User.findByIdAndUpdate(userID,{cgpa},{new:true}).select("-password");
-        res.json(updated);
+      const userID = req.user.id;
+      const { cgpa } = req.body;
+      let updated = await User.findByIdAndUpdate(
+        userID,
+        { cgpa },
+        { new: true }
+      ).select("-password");
+      res.json(updated);
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error!");
+      console.error(error.message);
+      res.status(500).send("Internal Server Error!");
     }
   }
 );

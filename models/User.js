@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const jwt = require('jsonwebtoken');
 require("dotenv").config();
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.REACT_APP_JWT_SECRET;
 
 const userSchema = new Schema({
   name: {

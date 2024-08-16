@@ -3,7 +3,7 @@ const express = require("express");
 const User = require("./models/User");
 var cors = require("cors");
 require("dotenv").config();
-const session = require("express-session");
+const session = require("cookie-session");
 const passport = require("passport");
 const OAuth2Strategy = require("passport-google-oauth2").Strategy;
 

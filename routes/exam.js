@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Exam = require("../models/Exam");
 var fetchSemester = require("../middleware/fetchSemester");
-var fetchUser = require("../middleware/fetchUser");
+var fetchUser = require("../middleware/fetchuser");
 var fetchSubject = require("../middleware/fetchSubject");
 const { body, validationResult } = require("express-validator");
 

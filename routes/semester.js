@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Semester = require("../models/Semester");
-var fetchuser = require("../middleware/fetchUser");
+var fetchuser = require("../middleware/fetchuser");
 const { body, validationResult } = require("express-validator");
 
 //? ADD A SEMESTER USING: POST "/api/semester/newsemester" WITH VALIDATIONS - LOGIN REQUIRED

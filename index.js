@@ -36,7 +36,8 @@ passport.use(
     async (request, accessToken, refreshToken, profile, done) => {
         console.log("profile",profile)
       try {
-        let user = await User.findOne({ googleId: profile.id });
+        //let user = await User.findOne({ googleId: profile.id });
+          let user = await User.findOne({ email: profile.email });
         console.log(profile);
         if (!user) {
           user = new User({
